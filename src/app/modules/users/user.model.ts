@@ -1,15 +1,15 @@
 import { Schema, model } from 'mongoose';
-import { Address, FullName, User } from './user.interface';
+import { TAddress, TFullName, TUser, UserModel } from './user.interface';
 import bcrypt from 'bcrypt';
 import config from '../../config';
 
-const AddressSchema = new Schema<Address>({
+const AddressSchema = new Schema<TAddress>({
   street: { type: String, required: true },
   city: { type: String, required: true },
   country: { type: String, required: true },
 });
 
-const FullNameSchema = new Schema<FullName>({
+const FullNameSchema = new Schema<TFullName>({
   firstName: {
     type: String,
     required: true,
@@ -22,7 +22,7 @@ const FullNameSchema = new Schema<FullName>({
   },
 });
 
-const UserSchema = new Schema<User>(
+const UserSchema = new Schema<TUser, UserModel>(
   {
     userId: { type: Number, required: true, unique: true },
     username: { type: String, required: true, unique: true, trim: true },
@@ -47,6 +47,7 @@ const UserSchema = new Schema<User>(
   },
 );
 
+// Pre middleware/hooks
 UserSchema.pre('save', async function (next) {
   // eslint-disable-next-line @typescript-eslint/no-this-alias
   const user = this;
@@ -54,4 +55,10 @@ UserSchema.pre('save', async function (next) {
   next();
 });
 
-export const UserModel = model<User>('Users', UserSchema);
+// Custom Statics
+UserSchema.statics.isUserExist = async function (userId) {
+  const existingUser = await User.findOne({ userId });
+  return existingUser;
+};
+
+export const User = model<TUser, UserModel>('Users', UserSchema);

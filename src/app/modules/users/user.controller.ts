@@ -1,6 +1,6 @@
 import { Request, Response } from 'express';
 import { UserServices } from './user.service';
-import { User } from './user.interface';
+import { TUser } from './user.interface';
 import UserValidationSchema from './student.validation';
 
 const createUser = async (req: Request, res: Response) => {
@@ -11,7 +11,7 @@ const createUser = async (req: Request, res: Response) => {
 
     const result = await UserServices.createUserToDB(validatedData);
 
-    res.status(200).json({
+    res.status(201).json({
       status: true,
       message: 'User created successfully!',
       data: result,
@@ -19,8 +19,11 @@ const createUser = async (req: Request, res: Response) => {
   } catch (err: any) {
     res.status(500).json({
       status: false,
-      message: 'Something went wrong!',
-      error: err,
+      message: err.message,
+      error: {
+        code: res.statusCode,
+        description: err.message,
+      },
     });
   }
 };
@@ -35,8 +38,11 @@ const getUsers = async (req: Request, res: Response) => {
   } catch (err: any) {
     res.status(500).json({
       status: false,
-      message: 'Users not found!',
-      error: err,
+      message: err.message,
+      error: {
+        code: res.statusCode,
+        description: err.message,
+      },
     });
   }
 };
@@ -52,8 +58,11 @@ const getAUser = async (req: Request, res: Response) => {
   } catch (err: any) {
     res.status(404).json({
       status: false,
-      message: 'Users not found!',
-      error: err,
+      message: err.message,
+      error: {
+        code: res.statusCode,
+        description: err.message,
+      },
     });
   }
 };
@@ -65,7 +74,7 @@ const updateUser = async (req: Request, res: Response) => {
 
     const result = await UserServices.updateSpecificUser(
       Number(userId),
-      validatedUserData as User,
+      validatedUserData as TUser,
     );
     res.status(200).json({
       status: true,
@@ -75,8 +84,11 @@ const updateUser = async (req: Request, res: Response) => {
   } catch (err: any) {
     res.status(404).json({
       status: false,
-      message: 'Users not found!',
-      error: err,
+      message: err.message,
+      error: {
+        code: res.statusCode,
+        description: err.message,
+      },
     });
   }
 };
@@ -93,8 +105,11 @@ const deleteUser = async (req: Request, res: Response) => {
   } catch (err: any) {
     res.status(404).json({
       status: false,
-      message: 'Something went wrong!',
-      error: err,
+      message: err.message,
+      error: {
+        code: res.statusCode,
+        description: err.message,
+      },
     });
   }
 };
