@@ -39,10 +39,12 @@ const getSpecificUser = async (userId: number) => {
 
 const updateSpecificUser = async (userId: number, userData: TUser) => {
   if (await User.isUserExist(userId)) {
-    const updatedUserInfo = await User.updateOne(
+    const updatedUserInfo = await User.findOneAndUpdate(
       { userId },
       { $set: userData },
+      { new: true },
     );
+
     return updatedUserInfo;
   } else {
     throw new Error('User not found');
@@ -52,7 +54,7 @@ const updateSpecificUser = async (userId: number, userData: TUser) => {
 const deleteSpecificUser = async (userId: number) => {
   if (await User.isUserExist(userId)) {
     const result = await User.deleteOne({ userId });
-    return result;
+    return null;
   } else {
     throw new Error('User not found');
   }
