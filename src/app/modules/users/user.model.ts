@@ -2,26 +2,33 @@ import { Schema, model } from 'mongoose';
 import { Address, FullName, User } from './user.interface';
 
 const AddressSchema = new Schema<Address>({
-  street: { type: String, required: [true, 'Street is required'] },
-  city: { type: String, required: [true, 'City is required'] },
-  country: { type: String, required: [true, 'City is required'] },
+  street: { type: String, required: true },
+  city: { type: String, required: true },
+  country: { type: String, required: true },
 });
 
 const FullNameSchema = new Schema<FullName>({
-  firstName: { type: String, required: [true, 'First name is required'] },
-  lastName: { type: String, required: [true, 'Last name is required'] },
+  firstName: {
+    type: String,
+    required: true,
+    trim: true,
+  },
+  lastName: {
+    type: String,
+    required: true,
+    trim: true,
+  },
 });
 
 const UserSchema = new Schema<User>(
   {
     userId: { type: Number, required: true, unique: true },
-    username: { type: String, required: true, unique: true },
+    username: { type: String, required: true, unique: true, trim: true },
     password: {
       type: String,
-      required: [true, 'Password is required'],
-      minlength: [8, 'Password must be 8 charecter or more'],
+      required: true,
     },
-    fullName: { type: FullNameSchema, required: [true, 'Name is required'] },
+    fullName: { type: FullNameSchema, required: true },
     age: { type: Number, required: true },
     email: { type: String, required: true },
     isActive: { type: Boolean, required: true, default: true },

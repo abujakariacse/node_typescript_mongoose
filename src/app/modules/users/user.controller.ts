@@ -1,17 +1,22 @@
 import { Request, Response } from 'express';
 import { UserServices } from './user.service';
 import { User } from './user.interface';
+import UserValidationSchema from './student.validation';
 
 const createUser = async (req: Request, res: Response) => {
   try {
     const user = req.body;
-    const result = await UserServices.createUserToDB(user);
+
+    const validatedData = UserValidationSchema.parse(user);
+
+    const result = await UserServices.createUserToDB(validatedData);
+
     res.status(200).json({
       status: true,
       message: 'User created successfully!',
       data: result,
     });
-  } catch (err) {
+  } catch (err: any) {
     res.status(500).json({
       status: false,
       message: 'Something went wrong!',
@@ -27,7 +32,7 @@ const getUsers = async (req: Request, res: Response) => {
       message: 'Users fetched successfully!',
       data: result,
     });
-  } catch (err) {
+  } catch (err: any) {
     res.status(500).json({
       status: false,
       message: 'Users not found!',
@@ -44,7 +49,7 @@ const getAUser = async (req: Request, res: Response) => {
       message: 'User fetched successfully!',
       data: result,
     });
-  } catch (err) {
+  } catch (err: any) {
     res.status(404).json({
       status: false,
       message: 'Users not found!',
@@ -55,18 +60,19 @@ const getAUser = async (req: Request, res: Response) => {
 const updateUser = async (req: Request, res: Response) => {
   try {
     const { userId } = req.params;
-    const updateUserInfo = req.body;
+    const userData = req.body;
+    const validatedUserData = UserValidationSchema.parse(userData);
 
     const result = await UserServices.updateSpecificUser(
       Number(userId),
-      updateUserInfo as User,
+      validatedUserData as User,
     );
     res.status(200).json({
       status: true,
       message: 'User updated successfully!',
       data: result,
     });
-  } catch (err) {
+  } catch (err: any) {
     res.status(404).json({
       status: false,
       message: 'Users not found!',
@@ -84,7 +90,7 @@ const deleteUser = async (req: Request, res: Response) => {
       message: 'User deleted successfully!',
       data: result,
     });
-  } catch (err) {
+  } catch (err: any) {
     res.status(404).json({
       status: false,
       message: 'Something went wrong!',
