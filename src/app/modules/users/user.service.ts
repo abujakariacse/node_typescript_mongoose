@@ -23,13 +23,29 @@ const getAllUser = async () => {
   return users;
 };
 
+// Retrive Specific User
 const getSpecificUser = async (userId: number) => {
   const user = await UserModel.findOne({ userId });
   return user;
+};
+
+const updateSpecificUser = async (userId: number, userData: User) => {
+  const updatedUserInfo = await UserModel.updateOne(
+    { userId },
+    { $set: userData },
+  );
+  return updatedUserInfo;
+};
+
+const deleteSpecificUser = async (userId: number) => {
+  const result = await UserModel.deleteOne({ userId });
+  return result;
 };
 
 export const UserServices = {
   createUserToDB,
   getAllUser,
   getSpecificUser,
+  updateSpecificUser,
+  deleteSpecificUser,
 };
