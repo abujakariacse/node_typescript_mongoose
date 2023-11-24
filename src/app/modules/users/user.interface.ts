@@ -1,11 +1,11 @@
+export type FullName = {
+  firstName: string;
+  lastName: string;
+};
 export type Address = {
   street: string;
   city: string;
   country: string;
-};
-export type FullName = {
-  firstName: string;
-  lastName: string;
 };
 
 export type User = {
