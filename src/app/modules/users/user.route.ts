@@ -13,6 +13,4 @@ router.put('/:userId', UserController.updateUser);
 
 router.delete('/:userId', UserController.deleteUser);
 
-export const UserRoutes = {
-  router,
-};
+export const UserRoutes = router;

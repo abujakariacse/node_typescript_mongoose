@@ -4,10 +4,6 @@
 
 - [Setup](#setup)
 - [Running the Application](#running-the-application)
-- [API Endpoints](#api-endpoints)
-  - [User Management](#user-management)
-- [Validation](#validation)
-- [Additional Notes](#additional-notes)
 
 ## Setup
 

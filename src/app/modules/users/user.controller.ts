@@ -7,9 +7,9 @@ const createUser = async (req: Request, res: Response) => {
   try {
     const user = req.body;
 
-    const validatedData = UserValidationSchema.parse(user);
+    const { error, value } = UserValidationSchema.validate(user);
 
-    const result = await UserServices.createUserToDB(validatedData);
+    const result = await UserServices.createUserToDB(value);
 
     res.status(201).json({
       status: true,
@@ -19,11 +19,8 @@ const createUser = async (req: Request, res: Response) => {
   } catch (err: any) {
     res.status(500).json({
       status: false,
-      message: err.message,
-      error: {
-        code: res.statusCode,
-        description: err.message,
-      },
+      message: err.message || 'Something went wrong',
+      error: err,
     });
   }
 };
@@ -70,11 +67,11 @@ const updateUser = async (req: Request, res: Response) => {
   try {
     const { userId } = req.params;
     const userData = req.body;
-    const validatedUserData = UserValidationSchema.parse(userData);
+    const { error, value } = UserValidationSchema.validate(userData);
 
     const result = await UserServices.updateSpecificUser(
       Number(userId),
-      validatedUserData as TUser,
+      value as TUser,
     );
     res.status(200).json({
       status: true,
@@ -84,10 +81,10 @@ const updateUser = async (req: Request, res: Response) => {
   } catch (err: any) {
     res.status(404).json({
       status: false,
-      message: err.message,
+      message: err.message || 'User not found',
       error: {
         code: res.statusCode,
-        description: err.message,
+        description: 'User not found',
       },
     });
   }
@@ -105,10 +102,10 @@ const deleteUser = async (req: Request, res: Response) => {
   } catch (err: any) {
     res.status(404).json({
       status: false,
-      message: err.message,
+      message: err.message || 'User not found',
       error: {
         code: res.statusCode,
-        description: err.message,
+        description: 'User not found',
       },
     });
   }

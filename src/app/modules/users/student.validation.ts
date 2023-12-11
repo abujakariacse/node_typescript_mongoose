@@ -1,32 +1,34 @@
-import { z } from 'zod';
+import Joi from 'joi';
 
-const AddressValidationSchema = z.object({
-  street: z.string(),
-  city: z.string(),
-  country: z.string(),
+const addressValidationSchema = Joi.object({
+  street: Joi.string().required(),
+  city: Joi.string().required(),
+  country: Joi.string().required(),
 });
 
-const FullNameValidationSchema = z.object({
-  firstName: z
-    .string()
-    .max(20, { message: 'First name must be at most 20 characters long' }),
-  lastName: z
-    .string()
-    .max(20, { message: 'Last name must be at most 20 characters long' }),
+const orderValidationSchema = Joi.object({
+  productName: Joi.string().required(),
+  price: Joi.number().required(),
+  quantity: Joi.number().required(),
 });
 
-const UserValidationSchema = z.object({
-  userId: z.number(),
-  username: z.string(),
-  password: z
-    .string()
-    .min(6, { message: 'Password must be at least 6 characters long' }),
-  fullName: FullNameValidationSchema,
-  age: z.number(),
-  email: z.string().email(),
-  isActive: z.boolean().default(true),
-  hobbies: z.array(z.string()),
-  address: AddressValidationSchema,
+const FullNameValidationSchema = Joi.object({
+  firstName: Joi.string().required(),
+  lastName: Joi.string().required(),
 });
 
-export default UserValidationSchema;
+const userValidationSchema = Joi.object({
+  userId: Joi.number().required(),
+  username: Joi.string().required(),
+  password: Joi.string().required(),
+  fullName: FullNameValidationSchema.required(),
+  age: Joi.number().required(),
+  email: Joi.string().email().required(),
+  isActive: Joi.boolean().default(true).required(),
+  hobbies: Joi.array().items(Joi.string()).required(),
+  address: addressValidationSchema.required(),
+  orders: Joi.array().items(orderValidationSchema),
+  isDeleted: Joi.boolean,
+});
+
+export default userValidationSchema;

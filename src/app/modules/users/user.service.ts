@@ -16,11 +16,20 @@ const getAllUser = async () => {
   const users = await User.aggregate([
     {
       $project: {
-        username: 1,
-        fullName: 1,
-        age: 1,
-        email: 1,
-        address: 1,
+        _id: 0,
+        userId: 0,
+        password: 0,
+        isActive: 0,
+        hobbies: 0,
+        isDeleted: 0,
+        orders: 0,
+        fullName: {
+          _id: 0,
+        },
+        address: {
+          _id: 0,
+        },
+        __v: 0,
       },
     },
   ]);
