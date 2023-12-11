@@ -56,6 +56,7 @@ const UserSchema = new Schema<TUser, UserModel>(
       default: false,
     },
   },
+  // This will return data without password as response
   {
     toJSON: {
       transform: function (doc, ret) {

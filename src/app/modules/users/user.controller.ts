@@ -16,6 +16,7 @@ const createUser = async (req: Request, res: Response) => {
       message: 'User created successfully!',
       data: result,
     });
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
   } catch (err: any) {
     res.status(500).json({
       status: false,
@@ -24,6 +25,7 @@ const createUser = async (req: Request, res: Response) => {
     });
   }
 };
+
 const getUsers = async (req: Request, res: Response) => {
   try {
     const result = await UserServices.getAllUser();
@@ -32,6 +34,7 @@ const getUsers = async (req: Request, res: Response) => {
       message: 'Users fetched successfully!',
       data: result,
     });
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
   } catch (err: any) {
     res.status(500).json({
       status: false,
@@ -40,6 +43,7 @@ const getUsers = async (req: Request, res: Response) => {
     });
   }
 };
+
 const getAUser = async (req: Request, res: Response) => {
   try {
     const { userId } = req.params;
@@ -49,6 +53,7 @@ const getAUser = async (req: Request, res: Response) => {
       message: 'User fetched successfully!',
       data: result,
     });
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
   } catch (err: any) {
     res.status(404).json({
       status: false,
@@ -60,6 +65,7 @@ const getAUser = async (req: Request, res: Response) => {
     });
   }
 };
+
 const updateUser = async (req: Request, res: Response) => {
   try {
     const { userId } = req.params;
@@ -75,6 +81,7 @@ const updateUser = async (req: Request, res: Response) => {
       message: 'User updated successfully!',
       data: result,
     });
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
   } catch (err: any) {
     res.status(404).json({
       status: false,
@@ -86,6 +93,7 @@ const updateUser = async (req: Request, res: Response) => {
     });
   }
 };
+
 const deleteUser = async (req: Request, res: Response) => {
   try {
     const { userId } = req.params;
@@ -96,6 +104,7 @@ const deleteUser = async (req: Request, res: Response) => {
       message: 'User deleted successfully!',
       data: null,
     });
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
   } catch (err: any) {
     res.status(404).json({
       status: false,
@@ -103,6 +112,29 @@ const deleteUser = async (req: Request, res: Response) => {
       error: {
         code: res.statusCode,
         description: 'User not found',
+      },
+    });
+  }
+};
+
+const createOrder = async (req: Request, res: Response) => {
+  try {
+    const { userId } = req.params;
+    const body = req.body;
+    const result = await UserServices.createOrderToDB(Number(userId), body);
+    res.status(200).json({
+      success: true,
+      message: 'Order created successfully!',
+      data: result,
+    });
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  } catch (err: any) {
+    res.status(404).json({
+      success: false,
+      message: err.message || 'User not found',
+      error: {
+        code: 404,
+        description: 'User not found!',
       },
     });
   }
@@ -114,4 +146,5 @@ export const UserController = {
   getAUser,
   updateUser,
   deleteUser,
+  createOrder,
 };
