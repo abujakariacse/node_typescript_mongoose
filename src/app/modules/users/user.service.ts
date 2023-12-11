@@ -18,10 +18,8 @@ const getAllUser = async () => {
       $project: {
         _id: 0,
         userId: 0,
-        password: 0,
         isActive: 0,
         hobbies: 0,
-        isDeleted: 0,
         orders: 0,
         fullName: {
           _id: 0,
@@ -39,7 +37,9 @@ const getAllUser = async () => {
 // Retrive Specific User
 const getSpecificUser = async (userId: number) => {
   if (await User.isUserExist(userId)) {
-    const user = await User.findOne({ userId });
+    const user = await User.findOne({ userId }).select(
+      '-_id -orders -__v -fullName._id -address._id',
+    );
     return user;
   } else {
     throw new Error('User not found');

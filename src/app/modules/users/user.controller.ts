@@ -1,7 +1,7 @@
 import { Request, Response } from 'express';
 import { UserServices } from './user.service';
 import { TUser } from './user.interface';
-import UserValidationSchema from './student.validation';
+import UserValidationSchema from './user.validation';
 
 const createUser = async (req: Request, res: Response) => {
   try {
@@ -35,11 +35,8 @@ const getUsers = async (req: Request, res: Response) => {
   } catch (err: any) {
     res.status(500).json({
       status: false,
-      message: err.message,
-      error: {
-        code: res.statusCode,
-        description: err.message,
-      },
+      message: err.message || 'Something went wrong',
+      error: err,
     });
   }
 };
@@ -58,7 +55,7 @@ const getAUser = async (req: Request, res: Response) => {
       message: err.message,
       error: {
         code: res.statusCode,
-        description: err.message,
+        description: 'User not found',
       },
     });
   }
