@@ -77,8 +77,19 @@ const createOrderToDB = async (userId: number, data: TOrder) => {
     const result = await User.findOneAndUpdate(
       { userId },
       { $set: { orders: data } },
-    ).select('orders');
+    );
   }
+  return null;
+};
+
+const getOrderFromDB = async (userId: number) => {
+  if (await User.isUserExist(userId)) {
+    const result = await User.findOne({ userId }).select(
+      '-orders._id -_id -userName -age -address -isDeleted -isActive -fullName -username -userId -password -email -hobbies -__v',
+    );
+    return result;
+  }
+
   return null;
 };
 
@@ -89,4 +100,5 @@ export const UserServices = {
   updateSpecificUser,
   deleteSpecificUser,
   createOrderToDB,
+  getOrderFromDB,
 };

@@ -15,4 +15,6 @@ router.delete('/:userId', UserController.deleteUser);
 
 router.put('/:userId/orders', UserController.createOrder);
 
+router.get('/:userId/orders', UserController.getOrders);
+
 export const UserRoutes = router;
