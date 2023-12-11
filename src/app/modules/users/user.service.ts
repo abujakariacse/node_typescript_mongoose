@@ -27,6 +27,7 @@ const getAllUser = async () => {
         address: {
           _id: 0,
         },
+        isDeleted: 0,
         __v: 0,
       },
     },
@@ -38,7 +39,7 @@ const getAllUser = async () => {
 const getSpecificUser = async (userId: number) => {
   if (await User.isUserExist(userId)) {
     const user = await User.findOne({ userId }).select(
-      '-_id -orders -__v -fullName._id -address._id',
+      '-_id -orders -__v -fullName._id -address._id -isDeleted',
     );
     return user;
   } else {
@@ -52,8 +53,7 @@ const updateSpecificUser = async (userId: number, userData: TUser) => {
       { userId },
       { $set: userData },
       { new: true },
-    );
-
+    ).select('-_id -orders -__v -fullName._id -address._id -isDeleted');
     return updatedUserInfo;
   } else {
     throw new Error('User not found');
@@ -62,8 +62,11 @@ const updateSpecificUser = async (userId: number, userData: TUser) => {
 
 const deleteSpecificUser = async (userId: number) => {
   if (await User.isUserExist(userId)) {
-    const result = await User.deleteOne({ userId });
-    return null;
+    const result = await User.findOneAndUpdate(
+      { userId },
+      { isDeleted: true },
+    ).select('isDeleted');
+    if (result?.isDeleted) return null;
   } else {
     throw new Error('User not found');
   }

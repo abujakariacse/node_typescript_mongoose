@@ -51,6 +51,10 @@ const UserSchema = new Schema<TUser, UserModel>(
     orders: {
       type: [OrderShema],
     },
+    isDeleted: {
+      type: Boolean,
+      default: false,
+    },
   },
   {
     toJSON: {
@@ -63,10 +67,23 @@ const UserSchema = new Schema<TUser, UserModel>(
 );
 
 // Pre middleware/hooks
+
+// Pre hook to save password as hash
 UserSchema.pre('save', async function (next) {
   // eslint-disable-next-line @typescript-eslint/no-this-alias
   const user = this;
   user.password = await bcrypt.hash(user.password, Number(config.salt_round));
+  next();
+});
+
+//Pre hook to check user is deleted or not
+UserSchema.pre('find', function (next) {
+  this.find({ isDeleted: { $ne: true } });
+  next();
+});
+
+UserSchema.pre('findOne', function (next) {
+  this.find({ isDeleted: { $ne: true } });
   next();
 });
 
