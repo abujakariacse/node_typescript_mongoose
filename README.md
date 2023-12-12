@@ -25,7 +25,7 @@ NODE_ENV= production
 PORT = 5000
 DB_URL = mongodb+srv://user:password@cluster0.iyijdxk.mongodb.net/ecommerce?retryWrites=true&w=majority
 
-SALT_ROUND = 4343
+SALT_ROUND = 12
 ```
 
 #Running the Application

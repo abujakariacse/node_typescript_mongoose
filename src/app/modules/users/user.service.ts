@@ -72,11 +72,12 @@ const deleteSpecificUser = async (userId: number) => {
   }
 };
 
-const createOrderToDB = async (userId: number, data: TOrder) => {
+const createOrderToDB = async (userId: number, orderData: TOrder) => {
   if (await User.isUserExist(userId)) {
     const result = await User.findOneAndUpdate(
-      { userId },
-      { $set: { orders: data } },
+      { userId: userId },
+      { $push: { orders: orderData } },
+      { new: true },
     );
   }
   return null;
@@ -93,6 +94,69 @@ const getOrderFromDB = async (userId: number) => {
   return null;
 };
 
+const getTotalPriceOfOrders = async (userId: number) => {
+  if (await User.isUserExist(userId)) {
+    const getUserId: any = await User.findOne({
+      userId,
+    }).select('_id');
+    const userData = await User.aggregate([
+      // Stage -1
+      {
+        $match: {
+          _id: {
+            $in: [getUserId._id],
+          },
+        },
+      },
+      // Stage - 2
+      {
+        $unwind: '$orders',
+      },
+
+      // Stage - 3
+      // Multiply product price and quantity
+      {
+        $project: {
+          orders: 1,
+          total: {
+            $multiply: ['$orders.quantity', '$orders.price'],
+          },
+        },
+      },
+      // Stage - 4
+      // Sum total
+      {
+        $group: {
+          _id: 'orders.price',
+          totalPrice: {
+            $sum: { $sum: '$total' },
+          },
+        },
+      },
+      //stage -5
+      //  Sum Total Price
+      {
+        $group: {
+          _id: '$_id._id',
+          totalPrice: {
+            $sum: { $sum: '$totalPrice' },
+          },
+        },
+      },
+      //stage -6
+      //  remove _id using project
+      {
+        $project: {
+          _id: 0,
+        },
+      },
+    ]);
+    return userData;
+  } else {
+    throw new Error('User not found');
+  }
+};
+
 export const UserServices = {
   createUserToDB,
   getAllUser,
@@ -101,4 +165,5 @@ export const UserServices = {
   deleteSpecificUser,
   createOrderToDB,
   getOrderFromDB,
+  getTotalPriceOfOrders,
 };

@@ -70,10 +70,30 @@ const UserSchema = new Schema<TUser, UserModel>(
 // Pre middleware/hooks
 
 // Pre hook to save password as hash
-UserSchema.pre('save', async function (next) {
-  // eslint-disable-next-line @typescript-eslint/no-this-alias
-  const user = this;
-  user.password = await bcrypt.hash(user.password, Number(config.salt_round));
+// It will works on create and update password
+
+UserSchema.pre(/^(updateOne|save|findOneAndUpdate)/, async function (next) {
+  // eslint-disable-next-line @typescript-eslint/no-this-alias, @typescript-eslint/no-explicit-any
+  const user: any = this;
+
+  if (user.password) {
+    if (user.isModified('password')) {
+      user.password = await bcrypt.hash(
+        user.password,
+        Number(config.salt_round),
+      );
+    }
+    return next();
+  }
+
+  // eslint-disable-next-line no-unsafe-optional-chaining
+  const { password } = user.getUpdate()?.$set;
+  if (password) {
+    user._update.password = await bcrypt.hash(
+      password,
+      Number(config.salt_round),
+    );
+  }
   next();
 });
 
@@ -86,6 +106,10 @@ UserSchema.pre('find', function (next) {
 UserSchema.pre('findOne', function (next) {
   this.find({ isDeleted: { $ne: true } });
   next();
+});
+
+UserSchema.pre('aggregate', function () {
+  this.pipeline().unshift({ $match: { isDeleted: { $ne: true } } });
 });
 
 // Custom Statics

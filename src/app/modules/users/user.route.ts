@@ -17,4 +17,6 @@ router.put('/:userId/orders', UserController.createOrder);
 
 router.get('/:userId/orders', UserController.getOrders);
 
+router.get('/:userId/orders/total-price', UserController.sumOfOrders);
+
 export const UserRoutes = router;
