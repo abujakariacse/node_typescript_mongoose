@@ -8,7 +8,23 @@ const createUserToDB = async (user: TUser) => {
   }
 
   const result = await User.create(user);
-  return result;
+  return {
+    userId: result.userId,
+    username: result.username,
+    fullName: {
+      firstName: result.fullName.firstName,
+      lastName: result.fullName.lastName,
+    },
+    age: result.age,
+    email: result.email,
+    isActive: result.isActive,
+    hobbies: result.hobbies,
+    address: {
+      street: result.address.street,
+      city: result.address.city,
+      country: result.address.country,
+    },
+  };
 };
 
 // Get Users
@@ -17,7 +33,7 @@ const getAllUser = async () => {
     {
       $project: {
         _id: 0,
-        userId: 0,
+        password: 0,
         isActive: 0,
         hobbies: 0,
         orders: 0,

@@ -29,6 +29,6 @@ const userValidationSchema = joi_1.default.object({
     hobbies: joi_1.default.array().items(joi_1.default.string()).required(),
     address: addressValidationSchema.required(),
     orders: joi_1.default.array().items(orderValidationSchema),
-    isDeleted: joi_1.default.boolean,
+    isDeleted: joi_1.default.boolean().default(false),
 });
 exports.default = userValidationSchema;

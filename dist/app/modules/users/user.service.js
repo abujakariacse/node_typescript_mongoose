@@ -74,8 +74,11 @@ const deleteSpecificUser = (userId) => __awaiter(void 0, void 0, void 0, functio
 const createOrderToDB = (userId, orderData) => __awaiter(void 0, void 0, void 0, function* () {
     if (yield user_model_1.User.isUserExist(userId)) {
         const result = yield user_model_1.User.findOneAndUpdate({ userId: userId }, { $push: { orders: orderData } }, { new: true });
+        return null;
     }
-    return null;
+    else {
+        throw new Error('User not found');
+    }
 });
 const getOrderFromDB = (userId) => __awaiter(void 0, void 0, void 0, function* () {
     if (yield user_model_1.User.isUserExist(userId)) {
