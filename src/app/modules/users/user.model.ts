@@ -76,25 +76,29 @@ UserSchema.pre(/^(updateOne|save|findOneAndUpdate)/, async function (next) {
   // eslint-disable-next-line @typescript-eslint/no-this-alias, @typescript-eslint/no-explicit-any
   const user: any = this;
 
-  if (user.password) {
-    if (user.isModified('password')) {
-      user.password = await bcrypt.hash(
-        user.password,
+  try {
+    if (user.password) {
+      if (user.isModified('password')) {
+        user.password = await bcrypt.hash(
+          user.password,
+          Number(config.salt_round),
+        );
+      }
+      return next();
+    }
+
+    // eslint-disable-next-line no-unsafe-optional-chaining
+    const userCredentails = user.getUpdate()?.$set;
+    if (userCredentails?.password) {
+      user._update.password = await bcrypt.hash(
+        userCredentails?.password,
         Number(config.salt_round),
       );
     }
-    return next();
+    next();
+  } catch (error) {
+    console.log(error);
   }
-
-  // eslint-disable-next-line no-unsafe-optional-chaining
-  const { password } = user.getUpdate()?.$set;
-  if (password) {
-    user._update.password = await bcrypt.hash(
-      password,
-      Number(config.salt_round),
-    );
-  }
-  next();
 });
 
 //Pre hook to check user is deleted or not

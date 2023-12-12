@@ -14,26 +14,24 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.UserController = void 0;
 const user_service_1 = require("./user.service");
-const student_validation_1 = __importDefault(require("./student.validation"));
+const user_validation_1 = __importDefault(require("./user.validation"));
 const createUser = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const user = req.body;
-        const validatedData = student_validation_1.default.parse(user);
-        const result = yield user_service_1.UserServices.createUserToDB(validatedData);
+        const { error, value } = user_validation_1.default.validate(user);
+        const result = yield user_service_1.UserServices.createUserToDB(value);
         res.status(201).json({
             status: true,
             message: 'User created successfully!',
             data: result,
         });
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
     }
     catch (err) {
         res.status(500).json({
             status: false,
-            message: err.message,
-            error: {
-                code: res.statusCode,
-                description: err.message,
-            },
+            message: err.message || 'Something went wrong',
+            error: err,
         });
     }
 });
@@ -45,15 +43,13 @@ const getUsers = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
             message: 'Users fetched successfully!',
             data: result,
         });
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
     }
     catch (err) {
         res.status(500).json({
             status: false,
-            message: err.message,
-            error: {
-                code: res.statusCode,
-                description: err.message,
-            },
+            message: err.message || 'Something went wrong',
+            error: err,
         });
     }
 });
@@ -66,6 +62,7 @@ const getAUser = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
             message: 'User fetched successfully!',
             data: result,
         });
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
     }
     catch (err) {
         res.status(404).json({
@@ -73,7 +70,7 @@ const getAUser = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
             message: err.message,
             error: {
                 code: res.statusCode,
-                description: err.message,
+                description: 'User not found',
             },
         });
     }
@@ -82,21 +79,22 @@ const updateUser = (req, res) => __awaiter(void 0, void 0, void 0, function* () 
     try {
         const { userId } = req.params;
         const userData = req.body;
-        const validatedUserData = student_validation_1.default.parse(userData);
-        const result = yield user_service_1.UserServices.updateSpecificUser(Number(userId), validatedUserData);
+        const { error, value } = user_validation_1.default.validate(userData);
+        const result = yield user_service_1.UserServices.updateSpecificUser(Number(userId), value);
         res.status(200).json({
             status: true,
             message: 'User updated successfully!',
             data: result,
         });
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
     }
     catch (err) {
         res.status(404).json({
             status: false,
-            message: err.message,
+            message: err.message || 'User not found',
             error: {
                 code: res.statusCode,
-                description: err.message,
+                description: 'User not found',
             },
         });
     }
@@ -110,14 +108,82 @@ const deleteUser = (req, res) => __awaiter(void 0, void 0, void 0, function* () 
             message: 'User deleted successfully!',
             data: null,
         });
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
     }
     catch (err) {
         res.status(404).json({
             status: false,
-            message: err.message,
+            message: err.message || 'User not found',
             error: {
                 code: res.statusCode,
-                description: err.message,
+                description: 'User not found',
+            },
+        });
+    }
+});
+const createOrder = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        const { userId } = req.params;
+        const body = req.body;
+        const result = yield user_service_1.UserServices.createOrderToDB(Number(userId), body);
+        res.status(200).json({
+            success: true,
+            message: 'Order created successfully!',
+            data: result,
+        });
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    }
+    catch (err) {
+        res.status(404).json({
+            success: false,
+            message: err.message || 'User not found',
+            error: {
+                code: 404,
+                description: 'User not found!',
+            },
+        });
+    }
+});
+const getOrders = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        const { userId } = req.params;
+        const result = yield user_service_1.UserServices.getOrderFromDB(Number(userId));
+        res.status(200).json({
+            success: true,
+            message: 'Order fetched successfully!',
+            data: result,
+        });
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    }
+    catch (err) {
+        res.status(404).json({
+            success: false,
+            message: err.message || 'User not found',
+            error: {
+                code: 404,
+                description: 'User not found!',
+            },
+        });
+    }
+});
+const sumOfOrders = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        const { userId } = req.params;
+        const result = yield user_service_1.UserServices.getTotalPriceOfOrders(Number(userId));
+        res.status(200).json({
+            success: true,
+            message: 'Total price calculated successfully!',
+            data: result,
+        });
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    }
+    catch (err) {
+        res.status(404).json({
+            success: false,
+            message: err.message || 'User not found',
+            error: {
+                code: 404,
+                description: 'User not found!',
             },
         });
     }
@@ -128,4 +194,7 @@ exports.UserController = {
     getAUser,
     updateUser,
     deleteUser,
+    createOrder,
+    getOrders,
+    sumOfOrders,
 };

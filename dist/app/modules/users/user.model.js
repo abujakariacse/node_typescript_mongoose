@@ -33,8 +33,13 @@ const FullNameSchema = new mongoose_1.Schema({
         trim: true,
     },
 });
+const OrderShema = new mongoose_1.Schema({
+    productName: { type: String, required: true },
+    price: { type: Number, required: true },
+    quantity: { type: Number, required: true },
+});
 const UserSchema = new mongoose_1.Schema({
-    userId: { type: Number, required: true, unique: true },
+    userId: { type: Number, unique: true, required: true },
     username: { type: String, required: true, unique: true, trim: true },
     password: {
         type: String,
@@ -46,7 +51,16 @@ const UserSchema = new mongoose_1.Schema({
     isActive: { type: Boolean, required: true, default: true },
     hobbies: { type: [String], required: true },
     address: { type: AddressSchema, required: true },
-}, {
+    orders: {
+        type: [OrderShema],
+    },
+    isDeleted: {
+        type: Boolean,
+        default: false,
+    },
+}, 
+// This will return data without password as response
+{
     toJSON: {
         transform: function (doc, ret) {
             delete ret.password;
@@ -55,13 +69,43 @@ const UserSchema = new mongoose_1.Schema({
     },
 });
 // Pre middleware/hooks
-UserSchema.pre('save', function (next) {
+// Pre hook to save password as hash
+// It will works on create and update password
+UserSchema.pre(/^(updateOne|save|findOneAndUpdate)/, function (next) {
+    var _a;
     return __awaiter(this, void 0, void 0, function* () {
-        // eslint-disable-next-line @typescript-eslint/no-this-alias
+        // eslint-disable-next-line @typescript-eslint/no-this-alias, @typescript-eslint/no-explicit-any
         const user = this;
-        user.password = yield bcrypt_1.default.hash(user.password, Number(config_1.default.salt_round));
-        next();
+        try {
+            if (user.password) {
+                if (user.isModified('password')) {
+                    user.password = yield bcrypt_1.default.hash(user.password, Number(config_1.default.salt_round));
+                }
+                return next();
+            }
+            // eslint-disable-next-line no-unsafe-optional-chaining
+            const userCredentails = (_a = user.getUpdate()) === null || _a === void 0 ? void 0 : _a.$set;
+            if (userCredentails === null || userCredentails === void 0 ? void 0 : userCredentails.password) {
+                user._update.password = yield bcrypt_1.default.hash(userCredentails === null || userCredentails === void 0 ? void 0 : userCredentails.password, Number(config_1.default.salt_round));
+            }
+            next();
+        }
+        catch (error) {
+            console.log(error);
+        }
     });
+});
+//Pre hook to check user is deleted or not
+UserSchema.pre('find', function (next) {
+    this.find({ isDeleted: { $ne: true } });
+    next();
+});
+UserSchema.pre('findOne', function (next) {
+    this.find({ isDeleted: { $ne: true } });
+    next();
+});
+UserSchema.pre('aggregate', function () {
+    this.pipeline().unshift({ $match: { isDeleted: { $ne: true } } });
 });
 // Custom Statics
 UserSchema.statics.isUserExist = function (userId) {

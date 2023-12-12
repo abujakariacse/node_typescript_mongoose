@@ -79,8 +79,10 @@ const createOrderToDB = async (userId: number, orderData: TOrder) => {
       { $push: { orders: orderData } },
       { new: true },
     );
+    return null;
+  } else {
+    throw new Error('User not found');
   }
-  return null;
 };
 
 const getOrderFromDB = async (userId: number) => {
